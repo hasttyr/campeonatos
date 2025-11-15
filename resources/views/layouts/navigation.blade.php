@@ -10,15 +10,25 @@
                     </a>
                 </div>
 
-                <!-- Navigation Links -->
+                <!-- Navigation Links (auth only) -->
+                @auth
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
                     <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                         {{ __('Dashboard') }}
                     </x-nav-link>
                 </div>
+                @endauth
+
+                <!-- General stats visible to everyone -->
+                <div class="hidden sm:flex sm:items-center sm:ms-8 sm:gap-6">
+                    <div class="text-sm text-gray-700 dark:text-gray-300">Campeonatos: <span class="font-semibold">{{ \App\Models\Championship::count() }}</span></div>
+                    <div class="text-sm text-gray-700 dark:text-gray-300">Equipos: <span class="font-semibold">{{ \App\Models\Team::count() }}</span></div>
+                    <div class="text-sm text-gray-700 dark:text-gray-300">Jugadores: <span class="font-semibold">{{ \App\Models\Player::count() }}</span></div>
+                </div>
             </div>
 
-            <!-- Settings Dropdown -->
+            <!-- Settings Dropdown (auth only) -->
+            @auth
             <div class="hidden sm:flex sm:items-center sm:ms-6">
                 <x-dropdown align="right" width="48">
                     <x-slot name="trigger">
@@ -43,7 +53,7 @@
                             @csrf
 
                             <x-dropdown-link :href="route('logout')"
-                                    onclick="event.preventDefault();
+                                onclick="event.preventDefault();
                                                 this.closest('form').submit();">
                                 {{ __('Log Out') }}
                             </x-dropdown-link>
@@ -51,6 +61,16 @@
                     </x-slot>
                 </x-dropdown>
             </div>
+            @endauth
+
+            @guest
+            <div class="hidden sm:flex sm:items-center sm:ms-6 gap-3">
+                <a href="{{ route('login') }}" class="inline-block px-3 py-2 text-sm rounded-sm text-[#1b1b18] dark:text-[#EDEDEC] border border-transparent hover:border-gray-200 dark:hover:border-gray-700">{{ __('Log in') }}</a>
+                @if (Route::has('register'))
+                <a href="{{ route('register') }}" class="inline-block px-3 py-2 bg-indigo-600 text-white rounded-sm text-sm hover:bg-indigo-700">{{ __('Register') }}</a>
+                @endif
+            </div>
+            @endguest
 
             <!-- Hamburger -->
             <div class="-me-2 flex items-center sm:hidden">
@@ -67,12 +87,25 @@
     <!-- Responsive Navigation Menu -->
     <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden">
         <div class="pt-2 pb-3 space-y-1">
+            @auth
             <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                 {{ __('Dashboard') }}
             </x-responsive-nav-link>
+            @endauth
+            @guest
+            <x-responsive-nav-link :href="route('login')" :active="request()->routeIs('login')">
+                {{ __('Log in') }}
+            </x-responsive-nav-link>
+            @if (Route::has('register'))
+            <x-responsive-nav-link :href="route('register')" :active="request()->routeIs('register')">
+                {{ __('Register') }}
+            </x-responsive-nav-link>
+            @endif
+            @endguest
         </div>
 
         <!-- Responsive Settings Options -->
+        @auth
         <div class="pt-4 pb-1 border-t border-gray-200 dark:border-gray-600">
             <div class="px-4">
                 <div class="font-medium text-base text-gray-800 dark:text-gray-200">{{ Auth::user()->name }}</div>
@@ -89,12 +122,13 @@
                     @csrf
 
                     <x-responsive-nav-link :href="route('logout')"
-                            onclick="event.preventDefault();
+                        onclick="event.preventDefault();
                                         this.closest('form').submit();">
                         {{ __('Log Out') }}
                     </x-responsive-nav-link>
                 </form>
             </div>
         </div>
+        @endauth
     </div>
 </nav>
